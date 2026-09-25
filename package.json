@@ -1,8 +1,8 @@
 {
-  "name": "gods-eye-view",
+  "name": "coastal-intelligence",
   "private": true,
   "version": "0.1.1",
-  "description": "A real-time intelligence console for planet Earth — photorealistic 3D globe, live aircraft/ships/satellites/earthquakes/CCTV, and hands-free voice control. Runs in a browser.",
+  "description": "AI-powered coastal risk and monitoring platform for planet Earth — live vessel tracking, cyclone/wind/wave conditions, seismic/tsunami-heuristic risk, and a coastal risk index, on a photorealistic 3D globe with hands-free voice control. Derived from God's Eye View (Bilawal Sidhu / Halfpixel), MIT licensed.",
   "type": "module",
   "license": "MIT",
   "author": "Bilawal Sidhu",

@@ -1,8 +1,9 @@
 import * as Cesium from 'cesium';
+import { getActiveCoastalRegion } from './config/coastalRegion.js';
 
 /**
  * Camera presets for notable locations.
- * Phase 1 default: fly to Austin, TX on load.
+ * Coastal Intelligence default: fly to the active coastal region on load.
  */
 export const CAMERA_PRESETS = {
   austin: {
@@ -47,13 +48,17 @@ export function flyToPreset(viewer, presetName, duration = 3.0) {
 }
 
 /**
- * Set camera to Austin on load with a cinematic fly-in.
+ * Set camera to the active coastal region on load with a cinematic fly-in.
+ * Kept as `flyToAustin` for call-site compatibility; the destination is
+ * config-driven via src/config/coastalRegion.js, not hardcoded to Austin.
  * @returns {Function} Cancels the pending or active startup flight.
  */
 export function flyToAustin(viewer) {
+  const region = getActiveCoastalRegion();
+  const { longitude, latitude } = region.center;
   // Start from a high altitude, then fly down
   viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(-97.7431, 30.2672, 25000),
+    destination: Cesium.Cartesian3.fromDegrees(longitude, latitude, 25000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-90),
@@ -65,7 +70,7 @@ export function flyToAustin(viewer) {
   const timer = setTimeout(() => {
     if (viewer.isDestroyed()) return;
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-97.7431, 30.2672, 600),
+      destination: Cesium.Cartesian3.fromDegrees(longitude, latitude, 600),
       orientation: {
         heading: Cesium.Math.toRadians(15),
         pitch: Cesium.Math.toRadians(-30),

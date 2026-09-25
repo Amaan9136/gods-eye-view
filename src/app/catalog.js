@@ -14,6 +14,25 @@ const CONTROL_LAYER_IDS = Object.freeze({
   localAdsbLayer: 'local-adsb',
 });
 
+/**
+ * Coastal Intelligence only constructs a subset of the original layers (see
+ * src/app/constructCatalog.js). Rather than rip every `servicesX.stopTracking?.()`
+ * call site out of the UI layer, a missing control layer gets a harmless
+ * no-op stand-in here: any method call on it resolves to undefined instead
+ * of throwing "Cannot read properties of undefined".
+ */
+function noopControlLayerStub() {
+  return new Proxy(
+    {},
+    {
+      get: (target, prop) => {
+        if (prop === 'then' || typeof prop === 'symbol') return undefined;
+        return () => undefined;
+      },
+    },
+  );
+}
+
 /** Capture the ordered application instances and their serialization metadata. */
 export function createLayerCatalog(layers, metadata) {
   if (!Array.isArray(layers) || !Array.isArray(metadata))
@@ -51,9 +70,7 @@ export function catalogControlServices(catalog) {
     throw new TypeError('An application layer catalog is required');
   return Object.fromEntries(
     Object.entries(CONTROL_LAYER_IDS).map(([role, id]) => {
-      const layer = catalog.get(id);
-      if (!layer)
-        throw new TypeError(`Control layer missing from catalog: ${id}`);
+      const layer = catalog.get(id) || noopControlLayerStub();
       return [role, layer];
     }),
   );
