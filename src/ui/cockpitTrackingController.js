@@ -4,15 +4,52 @@ import {
   resolveTrackedAircraftInfo,
 } from '../cockpitMath.js';
 
+/**
+ * Coastal Intelligence: the aircraft-tracking layers (flights/military) that
+ * originally fed this are no longer constructed (see src/app/constructCatalog.js),
+ * so `civilian`/`military` below are always null and this used to return
+ * null unconditionally — meaning Cockpit mode could never be entered at all,
+ * for any entity. As a replacement, any currently-tracked Cesium entity
+ * (e.g. a selected vessel from the vessels layer) now drives Cockpit mode
+ * directly: position comes from the entity itself in cockpitCamera.js's
+ * update(), so all that's needed here is a minimal synthetic info object.
+ * `track` (heading) is read from the entity's own `course`/`heading`
+ * property if the layer set one; if not, it's left non-finite and the
+ * camera simply keeps whatever heading it already had (see the
+ * `Number.isFinite(info.track)` guard in cockpitCamera.js — this is an
+ * existing, already-safe fallback path, not new risk).
+ */
+function syntheticTrackedInfo(trackedEntity, currentTime) {
+  if (!trackedEntity) return null;
+  const courseProp =
+    trackedEntity.properties?.course ||
+    trackedEntity.properties?.heading ||
+    trackedEntity.properties?.cog;
+  let track = NaN;
+  try {
+    const raw = courseProp?.getValue?.(currentTime);
+    if (Number.isFinite(raw)) track = raw;
+  } catch {
+    track = NaN;
+  }
+  return {
+    icao24: String(trackedEntity.id ?? trackedEntity.gevTrackedId ?? 'tracked-entity'),
+    track,
+    layerId: 'entity',
+  };
+}
+
 export function readAircraftInfo() {
   // In cockpit mode the controller takes the entity off `viewer.trackedEntity`
   // (see update()), so the cockpit's own handle is the tracked identity there.
   const trackedEntity = this.viewer?.trackedEntity || this.trackedEntity;
-  return resolveTrackedAircraftInfo({
+  const aircraftInfo = resolveTrackedAircraftInfo({
     civilian: this.services.flightsLayer.getTrackedInfo?.() || null,
     military: this.services.militaryFlightsLayer.getTrackedInfo?.() || null,
     trackedId: trackedEntity?.gevTrackedId || '',
   });
+  if (aircraftInfo) return aircraftInfo;
+  return syntheticTrackedInfo(trackedEntity, this.viewer?.clock?.currentTime);
 }
 
 export function dispatchCockpitModeChanged(active, info = null) {

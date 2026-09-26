@@ -1,4 +1,4 @@
-# Coastal Intelligence
+# Coastal Intelligence (Coastal Eye)
 
 AI-powered coastal risk and monitoring platform for **planet Earth** — a fork of [God's Eye View](https://github.com/bilawalsidhu/gods-eye-view) (Bilawal Sidhu, MIT licensed) narrowed from a general-purpose live-tracking globe to coastal/ocean risk data.
 
@@ -66,7 +66,13 @@ if (receiver) {
 
 Because `.receiver` resolved to a function (truthy), `if (receiver)` passed, and the SDR-controls constructor then called `.getState()` on that function — which doesn't have one. Fixed by having the stand-in return `undefined` for the couple of known data properties (`receiver`, `feeds`) while still returning a no-op function for method calls elsewhere in the codebase that call these stand-ins directly without `?.` (e.g. `radioLayer.getUIState()`, `cctvLayer.focusCamera(id)`). See the comment on `noopControlLayerStub` in `src/app/catalog.js` for the full reasoning.
 
-## Submarine / underwater "dive mode" — an honest assessment
+## Fixed: cockpit "flight" mode was completely unreachable
+
+The cockpit HUD (`src/ui/cockpit*.js`) — the "spaceship"-style free-look flying view — only ever activates by locking onto a **tracked aircraft entity** supplied by the flights/military layers. Since those layers are no longer constructed, `readAircraftInfo()` in `src/ui/cockpitTrackingController.js` always returned `null`, so pressing `C` did nothing — for any entity, not just aircraft. That's a real regression, not a pre-existing limitation.
+
+Fixed by making `readAircraftInfo()` fall back to a minimal synthetic info object for **any** currently-tracked Cesium entity when no aircraft-layer data exists — the rest of the cockpit camera math (`cockpitCamera.js`) already drives position generically off `this.trackedEntity.position`, and already no-ops safely on a non-finite heading (`normalizeHeading()` returns 0 for `NaN`), so this didn't require touching the camera math itself. Practically: **double-click a tracked vessel, then press `C`** to enter cockpit view riding it; toggle Dive Mode (see below) to take it under the surface. One caveat I couldn't verify without running the app: `src/layers/vessels/selection.js` has a comment stating vessels never explicitly set `viewer.trackedEntity` themselves — double-click-to-track is expected to come from Cesium's own default handler, which the app doesn't appear to override, but confirm this actually fires for a vessel before relying on it.
+
+
 
 Cesium has no default bathymetry, no seafloor terrain, and no free source of underwater 3D content — there's nothing to render down there without commissioning custom data, which isn't a free/keyless/24-hour option. `src/diveMode.js` gives a **cosmetic submersible mode** instead: the cockpit camera can drop below sea level (collision detection off) with a blue fog/tint. Pitch it as "submersible piloting mode for inspecting vessel positions and coastal conditions from below the surface," not literal seafloor exploration.
 

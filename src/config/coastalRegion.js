@@ -1,7 +1,7 @@
 /**
  * Coastal Intelligence is a planet-wide coastal/ocean risk platform, not a
  * single-city tool. This file just lists a handful of starter regions —
- * Mangaluru is the default
+ * Mangaluru is the default (built for Singularity 2026, AJIET Mangaluru),
  * but the same vessel/wind/weather/cyclone/earthquake/marine layers work
  * anywhere on Earth. Add a region here, or fly anywhere with the existing
  * place-search / fly-to-location feature — nothing else is India-specific.
