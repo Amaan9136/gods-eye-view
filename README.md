@@ -89,3 +89,7 @@ No paid APIs are required for the demo.
 ## Hackathon pitch (one paragraph)
 
 Coastal Intelligence fuses live vessel traffic, cyclone advisories, wind and wave conditions, and a tsunami-risk heuristic derived from real-time seismic data into a single 3D operating picture of any coastline on Earth — demoed on Mangaluru's, with real Indian coastal-hazard context (the 2004 tsunami, Cyclone Fani, the 2018 Kerala floods) built in — giving fisheries, port authorities, and coastal communities one glanceable Coastal Risk Index instead of five disconnected feeds, with a voice-controlled interface so it stays usable hands-free during an actual weather event.
+
+### Errors and its fixes
+
+Error "WebGL found but init failed" in Chrome browser -> go to chrome://flags/#ignore-gpu-blocklist, enable "Override software rendering list"

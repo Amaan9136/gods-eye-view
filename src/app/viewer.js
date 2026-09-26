@@ -102,11 +102,30 @@ export function installTrackpadPinchZoom(
   };
 }
 
-/** Create the standard globe viewer in caller-owned, visible containers. */
-export function createApplicationViewer({ container, creditContainer }) {
-  if (!container || !creditContainer)
-    throw new TypeError('Viewer and credit containers are required');
-  const viewer = new Cesium.Viewer(container, {
+function resolveContainerElement(container) {
+  return typeof container === 'string'
+    ? document.getElementById(container)
+    : container;
+}
+
+function logWebglDiagnostics() {
+  const probe = document.createElement('canvas');
+  const webgl2 = probe.getContext('webgl2');
+  const webgl1 = probe.getContext('webgl') || probe.getContext('experimental-webgl');
+  console.warn('[Viewer] WebGL diagnostics:', {
+    webgl2Available: !!webgl2,
+    webgl1Available: !!webgl1,
+    renderer: (webgl2 || webgl1)
+      ?.getExtension('WEBGL_debug_renderer_info')
+      && (webgl2 || webgl1).getParameter(
+        (webgl2 || webgl1).getExtension('WEBGL_debug_renderer_info')
+          .UNMASKED_RENDERER_WEBGL,
+      ),
+  });
+}
+
+function buildViewerOptions(creditContainer, contextOptions, extra = {}) {
+  return {
     timeline: false,
     animation: false,
     baseLayerPicker: false,
@@ -120,9 +139,49 @@ export function createApplicationViewer({ container, creditContainer }) {
     infoBox: false,
     baseLayer: false,
     creditContainer,
-    msaaSamples: 4,
-    contextOptions: { webgl: { preserveDrawingBuffer: true } },
-  });
+    contextOptions,
+    ...extra,
+  };
+}
+
+/** Create the standard globe viewer in caller-owned, visible containers. */
+export function createApplicationViewer({ container, creditContainer }) {
+  if (!container || !creditContainer)
+    throw new TypeError('Viewer and credit containers are required');
+  let viewer;
+  try {
+    viewer = new Cesium.Viewer(
+      container,
+      buildViewerOptions(
+        creditContainer,
+        { webgl: { preserveDrawingBuffer: true } },
+        { msaaSamples: 4 },
+      ),
+    );
+  } catch (error) {
+    logWebglDiagnostics();
+    console.warn(
+      '[Viewer] WebGL context creation failed, retrying with reduced graphics settings:',
+      error,
+    );
+    const containerElement = resolveContainerElement(container);
+    if (containerElement) containerElement.innerHTML = '';
+    try {
+      viewer = new Cesium.Viewer(
+        container,
+        buildViewerOptions(creditContainer, {
+          webgl: {
+            preserveDrawingBuffer: true,
+            failIfMajorPerformanceCaveat: false,
+          },
+          requestWebgl1: true,
+        }),
+      );
+    } catch (fallbackError) {
+      if (containerElement) containerElement.innerHTML = '';
+      throw fallbackError;
+    }
+  }
   try {
     viewer.targetFrameRate = 60;
     // Before any tile builds a draw command: Cesium's per-vertex model
