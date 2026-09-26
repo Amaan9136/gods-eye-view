@@ -85,3 +85,52 @@ export function flyToAustin(viewer) {
     if (!viewer.isDestroyed()) viewer.camera.cancelFlight();
   };
 }
+
+/**
+ * Fly to any registered coastal region preset (see src/config/coastalRegion.js).
+ * Used by the region switcher — this is how the app stays planet-wide instead
+ * of hardcoded to one city: every region uses the same flight, just different
+ * coordinates.
+ */
+export function flyToCoastalRegion(viewer, region, { durationSec = 3.5 } = {}) {
+  if (!region) return;
+  const { longitude, latitude } = region.center;
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(
+      longitude,
+      latitude,
+      region.cameraHeightMeters || 45000,
+    ),
+    orientation: {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(-55),
+      roll: 0.0,
+    },
+    duration: durationSec,
+    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+  });
+}
+
+/**
+ * Fly to a Coastal Story location (see src/data/coastalStories.js). Returns
+ * the story's summary text so a caller can show it in the HUD/voice reply —
+ * this module only owns the camera move, not any UI rendering.
+ */
+export function flyToCoastalStory(viewer, story, { durationSec = 3.5 } = {}) {
+  if (!story) return null;
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(
+      story.longitude,
+      story.latitude,
+      story.cameraHeightMeters || 20000,
+    ),
+    orientation: {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(-45),
+      roll: 0.0,
+    },
+    duration: durationSec,
+    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+  });
+  return { title: story.title, dateLabel: story.dateLabel, summary: story.summary };
+}

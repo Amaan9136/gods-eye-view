@@ -17,16 +17,27 @@ const CONTROL_LAYER_IDS = Object.freeze({
 /**
  * Coastal Intelligence only constructs a subset of the original layers (see
  * src/app/constructCatalog.js). Rather than rip every `servicesX.stopTracking?.()`
- * call site out of the UI layer, a missing control layer gets a harmless
- * no-op stand-in here: any method call on it resolves to undefined instead
- * of throwing "Cannot read properties of undefined".
+ * call site out of the UI layer, a missing control layer gets a stand-in
+ * here. Most call sites treat these as method-bearing objects
+ * (`flightsLayer.stopTracking?.()`, and a few WITHOUT the `?.` guard, e.g.
+ * `cctvLayer.focusCamera(id)` and `radioLayer.getUIState()`), so property
+ * access returns a no-op function for those. A couple of call sites instead
+ * read a *data* property and branch on its truthiness
+ * (`this.services.localAdsbLayer?.receiver` in applicationShell.js, then
+ * `if (receiver) new LocalSdrControls({ receiver })`, whose constructor
+ * calls `receiver.getState()`) — for those, returning a function made the
+ * property truthy and broke that branch with "receiver.getState is not a
+ * function". DATA_PROPERTIES lists the known cases that must read as
+ * `undefined` instead.
  */
+const STUB_DATA_PROPERTIES = new Set(['receiver', 'feeds']);
 function noopControlLayerStub() {
   return new Proxy(
     {},
     {
       get: (target, prop) => {
-        if (prop === 'then' || typeof prop === 'symbol') return undefined;
+        if (typeof prop === 'symbol' || STUB_DATA_PROPERTIES.has(prop))
+          return undefined;
         return () => undefined;
       },
     },

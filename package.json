@@ -2,7 +2,7 @@
   "name": "coastal-intelligence",
   "private": true,
   "version": "0.1.1",
-  "description": "AI-powered coastal risk and monitoring platform for planet Earth — live vessel tracking, cyclone/wind/wave conditions, seismic/tsunami-heuristic risk, and a coastal risk index, on a photorealistic 3D globe with hands-free voice control. Derived from God's Eye View (Bilawal Sidhu / Halfpixel), MIT licensed.",
+  "description": "AI-powered coastal risk and monitoring platform for planet Earth — live vessel tracking, cyclone/wind/wave conditions, seismic/tsunami-heuristic risk, and a coastal risk index, on a photorealistic 3D globe with hands-free voice control. Derived from God's Eye View (Bilawal Sidhu).",
   "type": "module",
   "license": "MIT",
   "author": "Bilawal Sidhu",
