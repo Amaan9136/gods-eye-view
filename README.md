@@ -72,8 +72,6 @@ The cockpit HUD (`src/ui/cockpit*.js`) — the "spaceship"-style free-look flyin
 
 Fixed by making `readAircraftInfo()` fall back to a minimal synthetic info object for **any** currently-tracked Cesium entity when no aircraft-layer data exists — the rest of the cockpit camera math (`cockpitCamera.js`) already drives position generically off `this.trackedEntity.position`, and already no-ops safely on a non-finite heading (`normalizeHeading()` returns 0 for `NaN`), so this didn't require touching the camera math itself. Practically: **double-click a tracked vessel, then press `C`** to enter cockpit view riding it; toggle Dive Mode (see below) to take it under the surface. One caveat I couldn't verify without running the app: `src/layers/vessels/selection.js` has a comment stating vessels never explicitly set `viewer.trackedEntity` themselves — double-click-to-track is expected to come from Cesium's own default handler, which the app doesn't appear to override, but confirm this actually fires for a vessel before relying on it.
 
-
-
 Cesium has no default bathymetry, no seafloor terrain, and no free source of underwater 3D content — there's nothing to render down there without commissioning custom data, which isn't a free/keyless/24-hour option. `src/diveMode.js` gives a **cosmetic submersible mode** instead: the cockpit camera can drop below sea level (collision detection off) with a blue fog/tint. Pitch it as "submersible piloting mode for inspecting vessel positions and coastal conditions from below the surface," not literal seafloor exploration.
 
 ## Setup
