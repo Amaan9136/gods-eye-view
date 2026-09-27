@@ -9,9 +9,12 @@ import { createApplicationVessels } from './layers/aisLiveVessels.js';
 import { createApplicationDirections } from './layers/directions.js';
 import { createApplicationEarthquakes } from './layers/earthquakes.js';
 import { createApplicationRadio } from './layers/radio.js';
+import { createApplicationRecentImagery } from './layers/recentImagery.js';
 import { createBhoteKoshiEventLayer } from '../data/bhoteKoshiEvent.js';
 import { createBhoteKoshiLocatorLayer } from '../data/bhoteKoshiLocator.js';
 import { createFirmsHeatmapLayer } from '../data/firmsHeatmap.js';
+import { createInfrastructureLayers } from '../data/infrastructure.js';
+import { localGeoJsonServices } from './localGeojsonServices.js';
 
 const SOURCE_METHODS = Object.freeze({
   vessels: ['getSnapshot'],
@@ -38,8 +41,11 @@ const COASTAL_LAYER_IDS = Object.freeze([
   'bhote-koshi-locator',
   'directions',
   'earthquakes',
+  'local-dams',
+  'local-datacenters',
   'local-firms',
   'radio',
+  'recent-imagery',
   'weather-cyclones',
   'weather-lightning',
   'weather-radar',
@@ -105,6 +111,7 @@ export function createApplicationCatalog({
         createApplicationDirections(),
         vessels,
         createApplicationRadio({ surface, source: sources.radio }),
+        createApplicationRecentImagery(),
         createBhoteKoshiEventLayer(),
         createBhoteKoshiLocatorLayer(),
         createFirmsHeatmapLayer({
@@ -113,6 +120,7 @@ export function createApplicationCatalog({
           icon: '▲',
           source: 'NASA FIRMS · LIVE',
         }),
+        ...createInfrastructureLayers(localGeoJsonServices),
         createMarineLayer(),
         createWindLayer({ feed: sources.wind, clock: weatherClock }),
         createWeatherLayer({
