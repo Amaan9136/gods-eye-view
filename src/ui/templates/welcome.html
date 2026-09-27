@@ -1,4 +1,4 @@
-  <!-- Explicit mission choice on a fresh session. Live feeds are not auto-enabled
+<!-- Explicit mission choice on a fresh session. Live feeds are not auto-enabled
        until the visitor asks; shared links skip this surface entirely. It returns
        every session until "Don't show this again" is ticked — see
        src/firstRunExperience.js for the full show policy. -->
@@ -16,12 +16,12 @@
     <div class="first-run-choices">
       <button type="button" data-first-run-choice="contacts">
         <span class="material-symbols-outlined" aria-hidden="true">radar</span>
-        <span><strong>LIVE CONTACTS</strong><small>Aircraft, vessels and nearby intelligence</small></span>
+        <span><strong>LIVE CONTACTS</strong><small>Live vessel traffic near your coastline</small></span>
         <span class="material-symbols-outlined first-run-arrow" aria-hidden="true">arrow_forward</span>
       </button>
-      <button type="button" data-first-run-choice="space-missions">
-        <span class="material-symbols-outlined" aria-hidden="true">rocket_launch</span>
-        <span><strong>SPACE MISSIONS</strong><small>Launches, spacecraft and orbital context</small></span>
+      <button type="button" data-first-run-choice="marine-conditions">
+        <span class="material-symbols-outlined" aria-hidden="true">waves</span>
+        <span><strong>MARINE CONDITIONS</strong><small>Live wave height and sea surface temperature</small></span>
         <span class="material-symbols-outlined first-run-arrow" aria-hidden="true">arrow_forward</span>
       </button>
       <button type="button" data-first-run-choice="environmental">

@@ -8,6 +8,9 @@ import { LAYER_STATE_REGISTRY } from '../data/layerState.js';
 import { createApplicationVessels } from './layers/aisLiveVessels.js';
 import { createApplicationDirections } from './layers/directions.js';
 import { createApplicationEarthquakes } from './layers/earthquakes.js';
+import { createApplicationRadio } from './layers/radio.js';
+import { createBhoteKoshiEventLayer } from '../data/bhoteKoshiEvent.js';
+import { createBhoteKoshiLocatorLayer } from '../data/bhoteKoshiLocator.js';
 
 const SOURCE_METHODS = Object.freeze({
   vessels: ['getSnapshot'],
@@ -15,6 +18,7 @@ const SOURCE_METHODS = Object.freeze({
   weather: ['getSnapshot'],
   cyclones: ['getSnapshot'],
   earthquakes: ['getSnapshot'],
+  radio: ['getDirectory'],
 });
 
 /**
@@ -29,8 +33,11 @@ const SOURCE_METHODS = Object.freeze({
  */
 const COASTAL_LAYER_IDS = Object.freeze([
   'ais-live-vessels',
+  'bhote-koshi-2026',
+  'bhote-koshi-locator',
   'directions',
   'earthquakes',
+  'radio',
   'weather-cyclones',
   'weather-lightning',
   'weather-radar',
@@ -95,6 +102,9 @@ export function createApplicationCatalog({
         createApplicationEarthquakes({ source: sources.earthquakes }),
         createApplicationDirections(),
         vessels,
+        createApplicationRadio({ surface, source: sources.radio }),
+        createBhoteKoshiEventLayer(),
+        createBhoteKoshiLocatorLayer(),
         createMarineLayer(),
         createWindLayer({ feed: sources.wind, clock: weatherClock }),
         createWeatherLayer({

@@ -90,14 +90,14 @@ export function environmentalLabel(choice = ENVIRONMENTAL_LABEL_CHOICE) {
 /** @type {Readonly<Record<string, object>>} */
 export const FIRST_RUN_MISSIONS = Object.freeze({
   contacts: Object.freeze({
-    kind: 'context',
-    contextMode: 'contacts',
-    busyText: 'Starting live contacts…',
+    kind: 'globe',
+    layerIds: Object.freeze(['ais-live-vessels']),
+    busyText: 'Starting live vessel tracking…',
   }),
-  'space-missions': Object.freeze({
-    kind: 'context',
-    contextMode: 'space-missions',
-    busyText: 'Opening space missions…',
+  'marine-conditions': Object.freeze({
+    kind: 'globe',
+    layerIds: Object.freeze(['marine-conditions']),
+    busyText: 'Loading marine conditions…',
   }),
   environmental: Object.freeze({
     kind: 'globe',
