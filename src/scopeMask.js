@@ -64,7 +64,7 @@ export const SCOPE_FEATHER_RATIO_DEFAULT = 0.11;
  * Terminus opacity at/above SCOPE_TERMINUS_FAR_M — slightly translucent so
  * faint stars survive in the corners at globe scale.
  */
-export const SCOPE_OUTSIDE_ALPHA = 0.3;
+export const SCOPE_OUTSIDE_ALPHA = 0.4;
 /**
  * Lowest SUPPORTED terminus opacity, as a share-link percent. The band exists
  * because anything below the globe-scale terminus is not a scope any more —
@@ -74,7 +74,7 @@ export const SCOPE_OUTSIDE_ALPHA = 0.3;
 export const SCOPE_TERMINUS_MIN_PCT = Math.round(SCOPE_OUTSIDE_ALPHA * 100);
 export const SCOPE_TERMINUS_MAX_PCT = 100;
 /** Terminus opacity at/below SCOPE_TERMINUS_NEAR_M — full black, no bleed. */
-export const SCOPE_TERMINUS_ALPHA_NEAR = 0.3;
+export const SCOPE_TERMINUS_ALPHA_NEAR = 0.4;
 /**
  * Camera height at/above which the terminus stays at SCOPE_OUTSIDE_ALPHA.
  * Owner retune (2026-08-17 field test): the relaxed 6% corners belong to TRUE

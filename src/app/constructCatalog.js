@@ -11,6 +11,7 @@ import { createApplicationEarthquakes } from './layers/earthquakes.js';
 import { createApplicationRadio } from './layers/radio.js';
 import { createBhoteKoshiEventLayer } from '../data/bhoteKoshiEvent.js';
 import { createBhoteKoshiLocatorLayer } from '../data/bhoteKoshiLocator.js';
+import { createFirmsHeatmapLayer } from '../data/firmsHeatmap.js';
 
 const SOURCE_METHODS = Object.freeze({
   vessels: ['getSnapshot'],
@@ -37,6 +38,7 @@ const COASTAL_LAYER_IDS = Object.freeze([
   'bhote-koshi-locator',
   'directions',
   'earthquakes',
+  'local-firms',
   'radio',
   'weather-cyclones',
   'weather-lightning',
@@ -105,6 +107,12 @@ export function createApplicationCatalog({
         createApplicationRadio({ surface, source: sources.radio }),
         createBhoteKoshiEventLayer(),
         createBhoteKoshiLocatorLayer(),
+        createFirmsHeatmapLayer({
+          id: 'local-firms',
+          name: 'FIRMS Active Fires',
+          icon: '▲',
+          source: 'NASA FIRMS · LIVE',
+        }),
         createMarineLayer(),
         createWindLayer({ feed: sources.wind, clock: weatherClock }),
         createWeatherLayer({
