@@ -10,6 +10,8 @@ import { createApplicationDirections } from './layers/directions.js';
 import { createApplicationEarthquakes } from './layers/earthquakes.js';
 import { createApplicationRadio } from './layers/radio.js';
 import { createApplicationRecentImagery } from './layers/recentImagery.js';
+import { createApplicationSatellites } from './layers/satellites.js';
+import { createApplicationLaunches } from './layers/rocketLaunches.js';
 import { createBhoteKoshiEventLayer } from '../data/bhoteKoshiEvent.js';
 import { createBhoteKoshiLocatorLayer } from '../data/bhoteKoshiLocator.js';
 import { createFirmsHeatmapLayer } from '../data/firmsHeatmap.js';
@@ -23,17 +25,23 @@ const SOURCE_METHODS = Object.freeze({
   cyclones: ['getSnapshot'],
   earthquakes: ['getSnapshot'],
   radio: ['getDirectory'],
+  satellites: ['readGroup'],
+  launches: ['getLaunches'],
 });
 
 /**
  * Coastal Intelligence keeps only the layers relevant to coastal/ocean risk
  * monitoring. Everything else from the original catalog (flights, military,
- * CCTV, radio, traffic, transit, satellites, bikeshare, ALPR, installations,
- * FIRMS, fire perimeters, submarine cables, launches, local ADS-B) is left
- * un-constructed here rather than deleted outright: several of those modules
- * are still imported by name elsewhere (e.g. the voice action runner), so
- * removing the files themselves is a separate, larger cleanup pass. This
- * allow-list is the single point that controls what actually runs.
+ * CCTV, traffic, transit, bikeshare, ALPR, installations, FIRMS fire
+ * perimeters, submarine cables, local ADS-B) is left un-constructed here
+ * rather than deleted outright: several of those modules are still imported
+ * by name elsewhere (e.g. the voice action runner), so removing the files
+ * themselves is a separate, larger cleanup pass. Satellites and rocket
+ * launches stay in: both are keyless, and the Space Missions context mode
+ * (contextModePolicy.js) hard-depends on both layers existing in the
+ * catalog — leaving them out doesn't hide that UI, it just makes every
+ * Space Missions transition fail. This allow-list is the single point that
+ * controls what actually runs.
  */
 const COASTAL_LAYER_IDS = Object.freeze([
   'ais-live-vessels',
@@ -46,6 +54,8 @@ const COASTAL_LAYER_IDS = Object.freeze([
   'local-firms',
   'radio',
   'recent-imagery',
+  'rocket-launches',
+  'satellites',
   'weather-cyclones',
   'weather-lightning',
   'weather-radar',
@@ -105,6 +115,9 @@ export function createApplicationCatalog({
       source: sources.vessels,
       options: vesselOptions,
     });
+    const satellites = createApplicationSatellites({
+      source: sources.satellites,
+    });
     const catalog = createLayerCatalog(
       [
         createApplicationEarthquakes({ source: sources.earthquakes }),
@@ -112,6 +125,8 @@ export function createApplicationCatalog({
         vessels,
         createApplicationRadio({ surface, source: sources.radio }),
         createApplicationRecentImagery(),
+        satellites,
+        createApplicationLaunches({ source: sources.launches, satellites }),
         createBhoteKoshiEventLayer(),
         createBhoteKoshiLocatorLayer(),
         createFirmsHeatmapLayer({
